@@ -123,7 +123,7 @@ const pluginMarketplace: PluginMarketplaceEntry[] = [
 export async function startWebManagementServer(options: WebManagementServerOptions = {}): Promise<WebManagementServerRuntime> {
   const host = options.host?.trim() || readEnvString("CCR_WEB_HOST") || defaultWebHost;
   const requestedPort = options.port ?? readEnvPort("CCR_WEB_PORT") ?? defaultWebPort;
-  const authToken = randomBytes(32).toString("base64url");
+  const authToken = readEnvString("CCR_WEB_TOKEN") || randomBytes(32).toString("base64url");
   let security: WebManagementSecurityContext | undefined;
   const server = createServer((request, response) => {
     if (!security) {

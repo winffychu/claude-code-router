@@ -6,6 +6,10 @@ services:
       - "3456:3456"
     volumes:
       - ccr-data:/app/.claude-code-router
+    environment:
+      # 固定 web token，方便访问管理界面。不设置则每次重启随机生成。
+      # 首次启动后用 docker logs 查看生成的 token（含完整 URL）
+      - CCR_WEB_TOKEN=my-secure-token
     restart: unless-stopped
     mem_limit: 256m
     mem_reservation: 128m
