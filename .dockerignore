@@ -1,6 +1,5 @@
+# 排除的目录 — 构建时不需要
 .git
-.gitignore
-.github
 node_modules
 dist
 release
@@ -11,21 +10,24 @@ examples
 tests
 tmp
 logs
+
+# 排除的文件类型
 *.log
 .DS_Store
+
+# 环境变量/凭据（不进入镜像层）
 .env
 .env.*
 !.env.example
+
+# IDE/编辑器
 .idea
 .claude
 .bot-gateway-state
 .agent-data
 .opencat
-*.md
-*.svg
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.ico
-*.icns
+
+# 注意：不排除 *.png/*.jpg/*.svg/*.ico 等资源文件，
+#       renderer 构建需要 src/renderer/assets/ 下的图标文件
+# 注意：不排除 *.md，
+#       package.json 使用 files=[] 控制发布，构建不影响
