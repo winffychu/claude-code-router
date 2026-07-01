@@ -123,7 +123,7 @@ const pluginMarketplace: PluginMarketplaceEntry[] = [
 export async function startWebManagementServer(options: WebManagementServerOptions = {}): Promise<WebManagementServerRuntime> {
   const host = options.host?.trim() || readEnvString("CCR_WEB_HOST") || defaultWebHost;
   const requestedPort = options.port ?? readEnvPort("CCR_WEB_PORT") ?? defaultWebPort;
-  const authToken = readEnvString("CCR_WEB_TOKEN") || randomBytes(32).toString("base64url");
+  const authToken = randomBytes(32).toString("base64url");
   let security: WebManagementSecurityContext | undefined;
   const server = createServer((request, response) => {
     if (!security) {
@@ -174,10 +174,6 @@ async function handleRequest(request: IncomingMessage, response: ServerResponse,
   }
   if (request.method !== "GET" && request.method !== "HEAD") {
     sendText(response, 405, "Method not allowed");
-    return;
-  }
-  if (url.pathname === "/health" || url.pathname === "/healthz") {
-    sendJson(response, 200, { ok: true, service: "ccr", uptime: process.uptime() });
     return;
   }
   if (url.pathname === "/" || url.pathname === "/pages/home/index.html") {
@@ -595,11 +591,6 @@ function isAllowedWebRequestHost(request: IncomingMessage, security: WebManageme
 }
 
 function isAllowedWebRequestOrigin(request: IncomingMessage, security: WebManagementSecurityContext): boolean {
-  // 绑定 0.0.0.0/:: 时跳过 origin 检查：管理员明确暴露给所有网络
-  if (security.allowIpLiteralHosts) {
-    return true;
-  }
-
   const origin = readHeaderValue(request.headers.origin);
   if (origin && !isAllowedWebOriginValue(origin, security)) {
     return false;
