@@ -22,6 +22,10 @@ LABEL org.opencontainers.image.title="Claude Code Router" \
       org.opencontainers.image.license="MIT" \
       org.opencontainers.image.source="https://github.com/winffychu/claude-code-router"
 
+# HOME=/app 使 config 路径从 /home/nonroot/.claude-code-router
+# 变为 /app/.claude-code-router（全部在 WORKDIR 下）
+ENV HOME=/app
+
 WORKDIR /app
 
 COPY --from=builder /build/node_modules ./node_modules
@@ -32,7 +36,7 @@ COPY --from=builder /build/package.json ./
 # Docker 命名 volume 首次挂载时会从此路径初始化内容/权限
 # 注意：distroless 无 /bin/sh，必须用 exec 或 SHELL 形式
 SHELL ["/nodejs/bin/node", "-e"]
-RUN require('fs').mkdirSync('/home/nonroot/.claude-code-router',{recursive:true,mode:0o700}); require('fs').writeFileSync('/home/nonroot/.claude-code-router/.docker-volume-marker','')
+RUN require('fs').mkdirSync('/app/.claude-code-router',{recursive:true,mode:0o700}); require('fs').writeFileSync('/app/.claude-code-router/.docker-volume-marker','')
 
 EXPOSE 3456 3457 3458
 
