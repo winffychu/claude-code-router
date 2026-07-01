@@ -50,7 +50,7 @@
     "test:renderer": "node build/test.mjs renderer && node build/run-tests.mjs renderer",
     "typecheck": "tsc --noEmit",
     "docker:build": "docker build -t claude-code-router .",
-    "docker:run": "docker run -d --name ccr -p 3456:3456 -p 3457:3457 -p 3458:3458 -v ccr-data:/root/.claude-code-router claude-code-router",
+    "docker:run": "docker run -d --name ccr -p 3456:3456 -p 3457:3457 -p 3458:3458 -v ccr-data:/home/node/.claude-code-router claude-code-router",
     "docker:stop": "docker stop ccr && docker rm ccr",
     "rebuild:sqlite3": "electron-rebuild -f -w better-sqlite3"
   },
