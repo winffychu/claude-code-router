@@ -176,6 +176,10 @@ async function handleRequest(request: IncomingMessage, response: ServerResponse,
     sendText(response, 405, "Method not allowed");
     return;
   }
+  if (url.pathname === "/health" || url.pathname === "/healthz") {
+    sendJson(response, 200, { ok: true, service: "ccr", uptime: process.uptime() });
+    return;
+  }
   if (url.pathname === "/" || url.pathname === "/pages/home/index.html") {
     sendHomeHtml(response, request.method === "HEAD");
     return;

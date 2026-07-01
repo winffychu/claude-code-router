@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  ccr:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: claude-code-router
+    ports:
+      # CCR Wrapper Gateway (Agent 连接用)
+      - "3456:3456"
+      # Core Gateway Runtime (内部使用)
+      - "3457:3457"
+      # Web Management UI
+      - "3458:3458"
+    volumes:
+      # 持久化配置、API Keys、用量日志
+      - ccr-data:/root/.claude-code-router
+    environment:
+      # 可选：设置监听地址（默认 0.0.0.0）
+      # - CCR_WEB_HOST=0.0.0.0
+      # - CCR_WEB_PORT=3458
+      # 可选：网关端口
+      # - CCR_GATEWAY_HOST=0.0.0.0
+      # - CCR_GATEWAY_PORT=3456
+      # - CCR_CORE_GATEWAY_HOST=0.0.0.0
+      # - CCR_CORE_GATEWAY_PORT=3457
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3458/health',(r)=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  ccr-data:
