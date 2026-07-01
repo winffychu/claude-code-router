@@ -11,8 +11,6 @@ RUN npm ci && npm cache clean --force
 COPY . .
 RUN npm run build:assets
 
-RUN mkdir -p /data/claude-code-router && chown -R 65532:65532 /data
-
 # =============================================================
 # Stage 2: distroless — 生产推荐
 #   Node.js 22 runtime, 非 root, 零 shell/包管理器, ~130MB
@@ -29,10 +27,11 @@ WORKDIR /app
 COPY --from=builder /build/node_modules ./node_modules
 COPY --from=builder /build/dist ./dist
 COPY --from=builder /build/package.json ./
-COPY --from=builder --chown=65532:65532 /data /home/nonroot/.claude-code-router
+
+# 初始化数据目录（确保 nonroot 有写权限）
+# Docker 命名 volume 首次挂载时会从此路径初始化内容/权限
+RUN /nodejs/bin/node -e "require('fs').mkdirSync('/home/nonroot/.claude-code-router',{recursive:true, mode:0o700}); require('fs').writeFileSync('/home/nonroot/.claude-code-router/.docker-volume-marker','')"
 
 EXPOSE 3456 3457 3458
-
-VOLUME ["/home/nonroot/.claude-code-router"]
 
 ENTRYPOINT ["/nodejs/bin/node", "dist/main/cli.js", "serve", "--host", "0.0.0.0"]

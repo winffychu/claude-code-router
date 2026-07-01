@@ -1,0 +1,14 @@
+services:
+  ccr:
+    image: ghcr.io/winffychu/claude-code-router:latest
+    container_name: claude-code-router
+    ports:
+      - "3456:3456"
+    volumes:
+      - ccr-data:/home/nonroot/.claude-code-router
+    restart: unless-stopped
+    mem_limit: 256m
+    mem_reservation: 128m
+
+volumes:
+  ccr-data:

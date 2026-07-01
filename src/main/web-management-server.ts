@@ -595,6 +595,11 @@ function isAllowedWebRequestHost(request: IncomingMessage, security: WebManageme
 }
 
 function isAllowedWebRequestOrigin(request: IncomingMessage, security: WebManagementSecurityContext): boolean {
+  // 绑定 0.0.0.0/:: 时跳过 origin 检查：管理员明确暴露给所有网络
+  if (security.allowIpLiteralHosts) {
+    return true;
+  }
+
   const origin = readHeaderValue(request.headers.origin);
   if (origin && !isAllowedWebOriginValue(origin, security)) {
     return false;
