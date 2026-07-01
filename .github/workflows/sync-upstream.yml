@@ -1,0 +1,38 @@
+name: 🔄 Sync Upstream
+
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Sync from upstream
+        run: |
+          git remote add upstream https://github.com/musistudio/claude-code-router.git
+          git fetch upstream main
+
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo "✅ Already up-to-date with upstream, no new commits."
+            exit 0
+          fi
+
+          echo "📥 New commits found, merging upstream/main..."
+          git merge upstream/main --no-edit
+          echo "NEW_COMMITS=true" >> "$GITHUB_ENV"
+
+      - name: Push to fork
+        if: env.NEW_COMMITS == 'true'
+        run: |
+          git push origin main
+          echo "✅ Synced upstream and pushed. Docker build will trigger automatically."
